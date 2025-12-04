@@ -1,0 +1,46 @@
+import heapq
+
+class Trie:
+    def __init__(self):
+        self.root = TrieNode()
+
+    # Вставка слова в Trie с обновлением частоты
+    def insert(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                node.children[char] = TrieNode()
+            node = node.children[char]
+        node.is_end = True
+        node.frequency += 1
+
+    # Проверка наличия слова в Trie
+    def search(self, word):
+        node = self.root
+        for char in word:
+            if char not in node.children:
+                return False
+            node = node.children[char]
+        return node.is_end
+
+    # Функция автодополнения с использованием Min-Heap
+    def autocomplete(self, prefix):
+        results = []
+        current_node = self.root
+        for char in prefix:
+            if char not in current_node.children:
+                return []  # Если префикс не существует
+            current_node = current_node.children[char]
+        
+        # Рекурсивный сбор всех потомков текущего узла
+        def collect_words(node, path):
+            if node.is_end:
+                results.append((node.frequency, ''.join(path)))
+            for child_char, child_node in node.children.items():
+                collect_words(child_node, path + [child_char])
+                
+        collect_words(current_node, list(prefix))
+        
+        # Используйте Min-Heap для сортировки результатов
+        top_results = heapq.nsmallest(5, results, key=lambda x: (-x[0], x[1]))
+        return [word for _, word in top_results]

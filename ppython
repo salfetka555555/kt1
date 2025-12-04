@@ -1,0 +1,16 @@
+from queue import PriorityQueue as PQ
+
+class RequestManager:
+    def __init__(self):
+        self.queue = PQ()
+
+    # Поставить запрос в очередь с указанным приоритетом
+    def enqueue(self, request, priority):
+        self.queue.put((-priority, request))  # Меняем знак приоритета для правильной сортировки
+
+    # Получить следующий запрос из очереди
+    def dequeue(self):
+        if not self.queue.empty():
+            return self.queue.get()[1]
+        else:
+            return None
